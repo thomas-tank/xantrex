@@ -1,9 +1,28 @@
-ESPHome custom component to read Xantrex GT2.8 solar inverter values via RS232.
+# ESPHome Xantrex Custom Component (Modernised)
 
-![esp8266 with RS232 module directly connected](images/xantrex%20rs232.jpg?raw=true "esp8266 with RS232")
+(Vibecode warning, use with caution)
 
-Uses the UART capability within esphome but uses regular component rather than pollingcomponent due to Xantrex solar inverter taking just over 2 seconds to respond to each command. So the esphome custom component implements 2 timers: (i) delay between command cycles (5 minutes) and (ii) delay after issuing each command before attempting to read the response (2.5 seconds). Subsequent commands are issues immediately after a response is read unless it is the last command in the group.
+This repository is a fork of the original Xantrex custom component, updated to ensure compatibility with modern ESPHome releases (tested and validated on **ESPHome 2026.6+** running **Python 3.13**).
 
-If you align the headers on the Wemos d1 mini with the RS232 module you can plug them directly without using jumper wires. Hence using D4 for tx and D3 for rx.
+## Why this fork exists
 
-A crossover cable may be required. I was previously using a Raspberry Pi with an extension serial cable wired through conduit and couldn't remember if that was crossover or not. I found I did need to add a crossover to get the esp8266 working.
+Recent core updates to ESPHome and Python introduced breaking changes to how custom components are initialized and structured. The original implementation caused runtime namespace crashes and compilation failures on modern stacks.
+
+### Key updates in this fork:
+
+- **Directory Structure Reorganisation:** Migrated layout to the standard `custom_components/xantrex/` format to prevent Python module resolution errors.
+- **Component Loader Compatibility:** Added a formal `__init__.py` file with proper schema validation to satisfy the current ESPHome core loader requirements.
+- **C++ API Modernisation:** Refactored `xantrex.h` to align with modern object-oriented instantiation, moving hardware definitions out of legacy inline C++ logic.
+- **Python Configuration Schema:** Updated `sensor.py` to handle all metadata tracking, device classes, state classes, and decimal precision layers directly within the Python build schema.
+
+## Installation & Configuration
+
+To use this modernised component, reference it as an external component in your ESPHome YAML configuration file:
+
+```yaml
+external_components:
+  - source:
+      type: git
+      url: [https://github.com/thomas-tank/xantrex](https://github.com/thomas-tank/xantrex)
+    components: [ xantrex ]
+```
